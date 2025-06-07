@@ -246,7 +246,7 @@
                     <button onclick="resetView()">איפוס תצוגה</button>
                     <button onclick="toggleAnimation()">הפסק/התחל סיבוב</button>
                 </div>
-                
+
                 <div class="control-group">
                     <input type="checkbox" id="toggleBrainOutline" checked>
                     <label for="toggleBrainOutline">הצג קווי מתאר מוח</label>
@@ -313,6 +313,7 @@
         let currentViewMode = '3d';
         let brainRegions = [];
         let brainOutline; // New variable for the transparent brain outline
+        let currentlyHighlightedRegion = null; // Stores the object currently highlighted
 
         // Brain anatomy data - Restored to more detailed/applied style, expanded for new regions
         const brainAnatomyData = {
@@ -557,8 +558,92 @@
                     'שמירה על משקל תקין: להפחתת עומס על מערכות התנועה.',
                     'תמיכה נוירולוגית במקרה של מחלות רקע.'
                 ]
+            },
+            'hypothalamus': {
+                name: 'היפותלמוס (Hypothalamus)',
+                functions: [
+                    'מרכז בקרה הורמונלי: מקשר בין מערכת העצבים למערכת ההורמונלית (בלוטת יותרת המוח).',
+                    'ויסות תפקודי גוף בסיסיים: טמפרטורה, רעב, צמא, שינה, מחזוריות יומית (שעון ביולוגי).',
+                    'שליטה על תגובות רגשיות ותגובות לחץ.'
+                ],
+                damage: [
+                    'הפרעות אכילה (בולמיה, אנורקסיה).',
+                    'בעיות בוויסות טמפרטורת הגוף.',
+                    'הפרעות שינה.',
+                    'חוסר איזון הורמונלי (לדוגמה, בעיות בפוריות, בעיות בבלוטת התריס).',
+                    'שינויים קיצוניים במצב הרוח.'
+                ],
+                tips: [
+                    'שמירה על סדר יום קבוע: חשוב לשעון הביולוגי.',
+                    'תזונה מאוזנת: תמיכה במערכת ההורמונלית.',
+                    'הפחתת סטרס: טכניקות הרפיה, מדיטציה.',
+                    'שינה מספקת ואיכותית.'
+                ]
+            },
+            'basal_ganglia': {
+                name: 'גרעיני הבסיס (Basal Ganglia)',
+                functions: [
+                    'קבוצת גרעינים עמוקים המעורבים בתכנון, יוזמה ובקרת תנועה (תנועות רצוניות).',
+                    'למידת הרגלים ועיצוב התנהגות (במיוחד הרגלים מוטוריים).',
+                    'מעורבים בתהליכים קוגניטיביים ורגשיים, כגון קבלת החלטות ותגמול.'
+                ],
+                damage: [
+                    'הפרעות תנועה קשות: פרקינסון (קשיים ביוזמת תנועה, רעד), הנטינגטון (תנועות בלתי רצוניות).',
+                    'דיסטוניה (התכווצויות שרירים מתמשכות).',
+                    'הפרעות טורדניות-כפייתיות (OCD) ותסמונת טורט.',
+                    'קשיים בלמידה מוטורית ושינוי הרגלים.'
+                ],
+                tips: [
+                    'פעילות גופנית המשלבת קואורדינציה: ריקוד, יוגה, אומנויות לחימה.',
+                    'למידה של מיומנויות חדשות: נגינה, ספורט חדש.',
+                    'שמירה על תזונה בריאה ועשירה בנוגדי חמצון.',
+                    'טיפול מתאים במקרה של מחלות נוירולוגיות.'
+                ]
+            },
+            'insular_cortex': {
+                name: 'קליפת האינסולה (Insular Cortex)',
+                functions: [
+                    'מעורבת בעיבוד כאב, טעם, ריח וגירויים פנימיים (תחושות מהגוף).',
+                    'תפקיד חשוב במודעות רגשית, אמפתיה וקבלת החלטות.',
+                    'אינטגרציה של מידע חושי ורגשי.',
+                    'מעורבת בתשוקות והתמכרויות.'
+                ],
+                damage: [
+                    'שינויים בתחושת כאב או טעם.',
+                    'פגיעה במודעות רגשית וביכולת לזהות רגשות אצל אחרים.',
+                    'קושי בקבלת החלטות מורכבות.',
+                    'הפרעות בהתמכרויות.'
+                ],
+                tips: [
+                    'מיינדפולנס ומדיטציה: שיפור מודעות לתחושות גוף ורגשות.',
+                    'פעילויות המעוררות חושים: בישול, אכילה מודעת.',
+                    'חיזוק קשרים חברתיים ופיתוח אמפתיה.',
+                    'התמודדות עם התמכרויות בטיפול מתאים.'
+                ]
+            },
+            'white_matter_tracts': {
+                name: 'חומר לבן (White Matter Tracts)',
+                functions: [
+                    'רשת הסיבים העצביים (אקסונים) שמחברים בין אזורים שונים במוח ומעבירים מידע במהירות.',
+                    'מאפשרים תקשורת יעילה ומתואמת בין אזורים שונים במוח.',
+                    'חיוניים ללמידה, זיכרון, קוגניציה ותפקודים מוטוריים.',
+                    'מהווה כ-60% מנפח המוח.'
+                ],
+                damage: [
+                    'האטה בקצב עיבוד המידע במוח.',
+                    'קשיים בקואורדינציה ובתנועה.',
+                    'הפרעות קוגניטיביות (זיכרון, קשב) כתוצאה מניתוק בין אזורים.',
+                    'מושפע במחלות כמו טרשת נפוצה (MS) ובפגיעות ראש טראומטיות.'
+                ],
+                tips: [
+                    'פעילות אירובית סדירה: מגבירה את זרימת הדם למוח ותומכת בבריאות החומר הלבן.',
+                    'תזונה עשירה באומגה 3, נוגדי חמצון וויטמינים (B12, D).',
+                    'למידה מתמשכת ואתגור קוגניטיבי: יוצרים ומחזקים קשרים עצביים חדשים.',
+                    'שינה איכותית: מאפשרת "ניקוי" ותיקון של תאי המוח וסיבי העצב.'
+                ]
             }
         };
+
 
         // Static colors for now, can be randomized or assigned later
         const regionColors = {
@@ -573,7 +658,11 @@
             'amygdala': '#FF8C00',       // Dark Orange
             'hippocampus': '#DAA520',    // Goldenrod
             'putamen': '#8A2BE2',        // Blue Violet
-            'globus_pallidus': '#ADFF2F' // Green Yellow
+            'globus_pallidus': '#ADFF2F', // Green Yellow
+            'hypothalamus': '#FFC0CB',   // Pink (New)
+            'basal_ganglia': '#800080',  // Purple (General group, can be split) (New)
+            'insular_cortex': '#00BFFF', // Deep Sky Blue (New)
+            'white_matter_tracts': '#E0E0E0' // Light Grey (New)
         };
 
 
@@ -589,7 +678,7 @@
             // Hide loading after initialization
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-            }, 2000);
+            }, 2000); // Give some time for initial render
         }
 
         function setupScene() {
@@ -632,13 +721,13 @@
             const frontalMaterial = createBrainMaterial(brainTexture, 'frontal_cortex');
             const frontalLobeLeft = new THREE.Mesh(frontalGeometry, frontalMaterial);
             frontalLobeLeft.position.set(-0.6, 0.4, 0.8);
-            frontalLobeLeft.userData = { regionName: 'frontal_cortex' };
+            frontalLobeLeft.userData = { regionName: 'frontal_cortex', originalColor: frontalMaterial.color.getHex() };
             brain.add(frontalLobeLeft);
             brainRegions.push(frontalLobeLeft);
 
             const frontalLobeRight = new THREE.Mesh(frontalGeometry, frontalMaterial);
             frontalLobeRight.position.set(0.6, 0.4, 0.8);
-            frontalLobeRight.userData = { regionName: 'frontal_cortex' };
+            frontalLobeRight.userData = { regionName: 'frontal_cortex', originalColor: frontalMaterial.color.getHex() };
             brain.add(frontalLobeRight);
             brainRegions.push(frontalLobeRight);
 
@@ -647,13 +736,13 @@
             const parietalMaterial = createBrainMaterial(brainTexture, 'parietal_cortex');
             const parietalLobeLeft = new THREE.Mesh(parietalGeometry, parietalMaterial);
             parietalLobeLeft.position.set(-0.5, 0.8, -0.2);
-            parietalLobeLeft.userData = { regionName: 'parietal_cortex' };
+            parietalLobeLeft.userData = { regionName: 'parietal_cortex', originalColor: parietalMaterial.color.getHex() };
             brain.add(parietalLobeLeft);
             brainRegions.push(parietalLobeLeft);
 
             const parietalLobeRight = new THREE.Mesh(parietalGeometry, parietalMaterial);
             parietalLobeRight.position.set(0.5, 0.8, -0.2);
-            parietalLobeRight.userData = { regionName: 'parietal_cortex' };
+            parietalLobeRight.userData = { regionName: 'parietal_cortex', originalColor: parietalMaterial.color.getHex() };
             brain.add(parietalLobeRight);
             brainRegions.push(parietalLobeRight);
 
@@ -663,14 +752,14 @@
             const temporalLobeLeft = new THREE.Mesh(temporalGeometry, temporalMaterial);
             temporalLobeLeft.position.set(-1.0, -0.2, 0.2);
             temporalLobeLeft.rotation.z = 0.3;
-            temporalLobeLeft.userData = { regionName: 'temporal_cortex' };
+            temporalLobeLeft.userData = { regionName: 'temporal_cortex', originalColor: temporalMaterial.color.getHex() };
             brain.add(temporalLobeLeft);
             brainRegions.push(temporalLobeLeft);
 
             const temporalLobeRight = new THREE.Mesh(temporalGeometry, temporalMaterial);
             temporalLobeRight.position.set(1.0, -0.2, 0.2);
             temporalLobeRight.rotation.z = -0.3;
-            temporalLobeRight.userData = { regionName: 'temporal_cortex' };
+            temporalLobeRight.userData = { regionName: 'temporal_cortex', originalColor: temporalMaterial.color.getHex() };
             brain.add(temporalLobeRight);
             brainRegions.push(temporalLobeRight);
 
@@ -679,13 +768,13 @@
             const occipitalMaterial = createBrainMaterial(brainTexture, 'occipital_cortex');
             const occipitalLobeLeft = new THREE.Mesh(occipitalGeometry, occipitalMaterial);
             occipitalLobeLeft.position.set(-0.3, 0.3, -1.2);
-            occipitalLobeLeft.userData = { regionName: 'occipital_cortex' };
+            occipitalLobeLeft.userData = { regionName: 'occipital_cortex', originalColor: occipitalMaterial.color.getHex() };
             brain.add(occipitalLobeLeft);
             brainRegions.push(occipitalLobeLeft);
 
             const occipitalLobeRight = new THREE.Mesh(occipitalGeometry, occipitalMaterial);
             occipitalLobeRight.position.set(0.3, 0.3, -1.2);
-            occipitalLobeRight.userData = { regionName: 'occipital_cortex' };
+            occipitalLobeRight.userData = { regionName: 'occipital_cortex', originalColor: occipitalMaterial.color.getHex() };
             brain.add(occipitalLobeRight);
             brainRegions.push(occipitalLobeRight);
 
@@ -695,7 +784,7 @@
             const cerebellumMaterial = createBrainMaterial(brainTexture, 'cerebellum');
             const cerebellum = new THREE.Mesh(cerebellumGeometry, cerebellumMaterial);
             cerebellum.position.set(0, -0.8, -0.8);
-            cerebellum.userData = { regionName: 'cerebellum' };
+            cerebellum.userData = { regionName: 'cerebellum', originalColor: cerebellumMaterial.color.getHex() };
             brain.add(cerebellum);
             brainRegions.push(cerebellum);
 
@@ -704,18 +793,18 @@
             const brainstemMaterial = createBrainMaterial(brainTexture, 'brainstem');
             const brainstem = new THREE.Mesh(brainstemGeometry, brainstemMaterial);
             brainstem.position.set(0, -0.3, 0);
-            brainstem.userData = { regionName: 'brainstem' };
+            brainstem.userData = { regionName: 'brainstem', originalColor: brainstemMaterial.color.getHex() };
             brain.add(brainstem);
             brainRegions.push(brainstem);
 
-            // --- New Internal Brain Regions ---
+            // --- Existing Internal Brain Regions ---
 
             // Corpus Callosum
             const corpusCallosumGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.3); // Flat, elongated shape
             const corpusCallosumMaterial = createBrainMaterial(brainTexture, 'corpus_callosum');
             const corpusCallosum = new THREE.Mesh(corpusCallosumGeometry, corpusCallosumMaterial);
             corpusCallosum.position.set(0, 0.2, 0); // Roughly in the center, above thalamus
-            corpusCallosum.userData = { regionName: 'corpus_callosum' };
+            corpusCallosum.userData = { regionName: 'corpus_callosum', originalColor: corpusCallosumMaterial.color.getHex() };
             brain.add(corpusCallosum);
             brainRegions.push(corpusCallosum);
 
@@ -724,13 +813,13 @@
             const thalamusMaterial = createBrainMaterial(brainTexture, 'thalamus');
             const thalamusLeft = new THREE.Mesh(thalamusGeometry, thalamusMaterial);
             thalamusLeft.position.set(-0.25, 0.05, 0);
-            thalamusLeft.userData = { regionName: 'thalamus' };
+            thalamusLeft.userData = { regionName: 'thalamus', originalColor: thalamusMaterial.color.getHex() };
             brain.add(thalamusLeft);
             brainRegions.push(thalamusLeft);
 
             const thalamusRight = new THREE.Mesh(thalamusGeometry, thalamusMaterial);
             thalamusRight.position.set(0.25, 0.05, 0);
-            thalamusRight.userData = { regionName: 'thalamus' };
+            thalamusRight.userData = { regionName: 'thalamus', originalColor: thalamusMaterial.color.getHex() };
             brain.add(thalamusRight);
             brainRegions.push(thalamusRight);
 
@@ -739,13 +828,13 @@
             const amygdalaMaterial = createBrainMaterial(brainTexture, 'amygdala');
             const amygdalaLeft = new THREE.Mesh(amygdalaGeometry, amygdalaMaterial);
             amygdalaLeft.position.set(-0.4, -0.15, 0.3); // Inferior and anterior to thalamus
-            amygdalaLeft.userData = { regionName: 'amygdala' };
+            amygdalaLeft.userData = { regionName: 'amygdala', originalColor: amygdalaMaterial.color.getHex() };
             brain.add(amygdalaLeft);
             brainRegions.push(amygdalaLeft);
 
             const amygdalaRight = new THREE.Mesh(amygdalaGeometry, amygdalaMaterial);
             amygdalaRight.position.set(0.4, -0.15, 0.3);
-            amygdalaRight.userData = { regionName: 'amygdala' };
+            amygdalaRight.userData = { regionName: 'amygdala', originalColor: amygdalaMaterial.color.getHex() };
             brain.add(amygdalaRight);
             brainRegions.push(amygdalaRight);
 
@@ -756,14 +845,14 @@
             const hippocampusLeft = new THREE.Mesh(hippocampusGeometry, hippocampusMaterial);
             hippocampusLeft.position.set(-0.4, -0.3, 0.0); // Posterior to amygdala
             hippocampusLeft.rotation.y = Math.PI / 4; // Slight rotation for better positioning
-            hippocampusLeft.userData = { regionName: 'hippocampus' };
+            hippocampusLeft.userData = { regionName: 'hippocampus', originalColor: hippocampusMaterial.color.getHex() };
             brain.add(hippocampusLeft);
             brainRegions.push(hippocampusLeft);
 
             const hippocampusRight = new THREE.Mesh(hippocampusGeometry, hippocampusMaterial);
             hippocampusRight.position.set(0.4, -0.3, 0.0);
             hippocampusRight.rotation.y = -Math.PI / 4;
-            hippocampusRight.userData = { regionName: 'hippocampus' };
+            hippocampusRight.userData = { regionName: 'hippocampus', originalColor: hippocampusMaterial.color.getHex() };
             brain.add(hippocampusRight);
             brainRegions.push(hippocampusRight);
 
@@ -772,13 +861,13 @@
             const putamenMaterial = createBrainMaterial(brainTexture, 'putamen');
             const putamenLeft = new THREE.Mesh(putamenGeometry, putamenMaterial);
             putamenLeft.position.set(-0.45, 0.0, -0.1); // Lateral to thalamus
-            putamenLeft.userData = { regionName: 'putamen' };
+            putamenLeft.userData = { regionName: 'putamen', originalColor: putamenMaterial.color.getHex() };
             brain.add(putamenLeft);
             brainRegions.push(putamenLeft);
 
             const putamenRight = new THREE.Mesh(putamenGeometry, putamenMaterial);
             putamenRight.position.set(0.45, 0.0, -0.1);
-            putamenRight.userData = { regionName: 'putamen' };
+            putamenRight.userData = { regionName: 'putamen', originalColor: putamenMaterial.color.getHex() };
             brain.add(putamenRight);
             brainRegions.push(putamenRight);
 
@@ -788,15 +877,77 @@
             const globusPallidusMaterial = createBrainMaterial(brainTexture, 'globus_pallidus');
             const globusPallidusLeft = new THREE.Mesh(globusPallidusGeometry, globusPallidusMaterial);
             globusPallidusLeft.position.set(-0.35, 0.0, -0.05); // Medial and slightly posterior to putamen
-            globusPallidusLeft.userData = { regionName: 'globus_pallidus' };
+            globusPallidusLeft.userData = { regionName: 'globus_pallidus', originalColor: globusPallidusMaterial.color.getHex() };
             brain.add(globusPallidusLeft);
             brainRegions.push(globusPallidusLeft);
 
             const globusPallidusRight = new THREE.Mesh(globusPallidusGeometry, globusPallidusMaterial);
             globusPallidusRight.position.set(0.35, 0.0, -0.05);
-            globusPallidusRight.userData = { regionName: 'globus_pallidus' };
+            globusPallidusRight.userData = { regionName: 'globus_pallidus', originalColor: globusPallidusMaterial.color.getHex() };
             brain.add(globusPallidusRight);
             brainRegions.push(globusPallidusRight);
+
+            // --- NEW BRAIN REGIONS ---
+
+            // Hypothalamus (Single, small, below thalamus)
+            const hypothalamusGeometry = new THREE.SphereGeometry(0.1, 12, 12); // Very small sphere
+            const hypothalamusMaterial = createBrainMaterial(brainTexture, 'hypothalamus');
+            const hypothalamus = new THREE.Mesh(hypothalamusGeometry, hypothalamusMaterial);
+            hypothalamus.position.set(0, -0.1, 0.1); // Below and slightly anterior to thalamus
+            hypothalamus.userData = { regionName: 'hypothalamus', originalColor: hypothalamusMaterial.color.getHex() };
+            brain.add(hypothalamus);
+            brainRegions.push(hypothalamus);
+
+            // Basal Ganglia (General group - will be a large, slightly irregular shape to encompass putamen/pallidus conceptually)
+            // This is a simplified representation of the larger basal ganglia system.
+            // Using a slightly larger, transparent object that highlights when selected.
+            const basalGangliaGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            basalGangliaGeometry.scale(1.0, 0.8, 1.0); // Make it slightly flattened
+            const basalGangliaMaterial = createBrainMaterial(brainTexture, 'basal_ganglia');
+            basalGangliaMaterial.opacity = 0.2; // Very transparent normally
+            const basalGangliaLeft = new THREE.Mesh(basalGangliaGeometry, basalGangliaMaterial);
+            basalGangliaLeft.position.set(-0.3, 0.0, 0.0);
+            basalGangliaLeft.userData = { regionName: 'basal_ganglia', originalColor: basalGangliaMaterial.color.getHex() };
+            brain.add(basalGangliaLeft);
+            brainRegions.push(basalGangliaLeft);
+
+            const basalGangliaRight = new THREE.Mesh(basalGangliaGeometry, basalGangliaMaterial);
+            basalGangliaRight.position.set(0.3, 0.0, 0.0);
+            basalGangliaRight.userData = { regionName: 'basal_ganglia', originalColor: basalGangliaMaterial.color.getHex() };
+            brain.add(basalGangliaRight);
+            brainRegions.push(basalGangliaRight);
+
+
+            // Insular Cortex (Left and Right) - represented as a hidden lobe behind temporal/frontal
+            const insularGeometry = createLobeGeometry([0.6, 0.5, 0.6]);
+            const insularMaterial = createBrainMaterial(brainTexture, 'insular_cortex');
+            const insularCortexLeft = new THREE.Mesh(insularGeometry, insularMaterial);
+            insularCortexLeft.position.set(-0.7, 0.1, 0.4); // Positioned slightly inwards/under temporal lobe
+            insularCortexLeft.rotation.y = -Math.PI / 8;
+            insularCortexLeft.userData = { regionName: 'insular_cortex', originalColor: insularMaterial.color.getHex() };
+            brain.add(insularCortexLeft);
+            brainRegions.push(insularCortexLeft);
+
+            const insularCortexRight = new THREE.Mesh(insularGeometry, insularMaterial);
+            insularCortexRight.position.set(0.7, 0.1, 0.4);
+            insularCortexRight.rotation.y = Math.PI / 8;
+            insularCortexRight.userData = { regionName: 'insular_cortex', originalColor: insularMaterial.color.getHex() };
+            brain.add(insularCortexRight);
+            brainRegions.push(insularCortexRight);
+
+            // White Matter Tracts (Simplified as general connecting fibers)
+            // This is a highly abstract representation. Can be a set of cylinders/lines.
+            // For simplicity, a central column/bundle of fibers.
+            const whiteMatterGeometry = new THREE.CylinderGeometry(0.3, 0.3, 2.5, 16); // Long cylinder
+            const whiteMatterMaterial = createBrainMaterial(brainTexture, 'white_matter_tracts');
+            whiteMatterMaterial.opacity = 0.1; // Very transparent normally
+            const whiteMatter = new THREE.Mesh(whiteMatterGeometry, whiteMatterMaterial);
+            whiteMatter.position.set(0, 0, 0);
+            whiteMatter.rotation.x = Math.PI / 2; // Orient along Z axis (front-back)
+            whiteMatter.userData = { regionName: 'white_matter_tracts', originalColor: whiteMatterMaterial.color.getHex() };
+            brain.add(whiteMatter);
+            brainRegions.push(whiteMatter);
+
 
             scene.add(brain);
         }
@@ -920,7 +1071,7 @@
                 if (selectedObject && selectedObject.userData.regionName) {
                     const selectedRegion = selectedObject.userData.regionName;
                     displayRegionInfo(selectedRegion);
-                    highlightRegion(selectedRegion); // Highlight by name, not object
+                    highlightRegion(selectedRegion);
                     document.getElementById('selectRegionDropdown').value = selectedRegion; // Update dropdown
                 }
             } else {
@@ -982,7 +1133,13 @@
             if (currentViewMode === '3d') {
                 sliceControls.style.display = 'none';
                 brainRegions.forEach(region => {
-                    region.material.opacity = 0.8; // Standard opacity for 3D view
+                    // Restore original opacity if it was changed for slice view
+                    // Special handling for basal_ganglia and white_matter_tracts which are usually very transparent
+                    if (region.userData.regionName === 'basal_ganglia' || region.userData.regionName === 'white_matter_tracts') {
+                        region.material.opacity = 0.2;
+                    } else {
+                        region.material.opacity = 0.8; // Standard opacity for 3D view
+                    }
                     region.material.transparent = true;
                     region.material.emissive.setHex(0x000000); // Clear highlight
                     region.scale.set(1, 1, 1);
@@ -994,9 +1151,10 @@
             } else {
                 sliceControls.style.display = 'block';
                 setupSliceView();
+                // Ensure all regions are transparent enough for slice view
                 brainRegions.forEach(region => {
                      region.material.transparent = true;
-                     region.material.opacity = 0.8;
+                     region.material.opacity = 0.8; // Will be further adjusted by onSliceDepthChange
                 });
                 onSliceDepthChange({ target: { value: document.getElementById('sliceDepth').value } });
             }
@@ -1024,7 +1182,7 @@
             document.getElementById('sliceValue').textContent = depth;
 
             brainRegions.forEach(region => {
-                const normalizedDepth = (depth - 50) / 50; // -1 to 1
+                const normalizedDepth = (depth - 50) / 50; // -1 to 1, maps 0-100 to -1 to 1
 
                 let positionToCheck = 0;
                 switch (currentViewMode) {
@@ -1039,10 +1197,24 @@
                         break;
                 }
 
-                const distance = Math.abs(positionToCheck - normalizedDepth * 2);
-                const maxDistance = 2.0;
-                const opacity = THREE.MathUtils.mapLinear(distance, 0, maxDistance, 0.8, 0.05);
-                region.material.opacity = Math.max(0.05, opacity);
+                // Calculate distance from the slicing plane
+                const distance = Math.abs(positionToCheck - normalizedDepth * 2); // Multiplied by 2 to match brain's scale
+                const maxVisibilityDistance = 1.5; // Regions within this distance will be more visible
+
+                // Use a curve to make opacity fall off sharply near the slice plane
+                let opacity = 0.05; // Base low opacity for far regions
+                if (distance < maxVisibilityDistance) {
+                    opacity = THREE.MathUtils.mapLinear(distance, 0, maxVisibilityDistance, 0.8, 0.05);
+                    opacity = Math.max(0.05, opacity); // Ensure minimum opacity
+                }
+
+                // Special handling for very transparent regions when not highlighted
+                if (currentlyHighlightedRegion !== region && (region.userData.regionName === 'basal_ganglia' || region.userData.regionName === 'white_matter_tracts')) {
+                    opacity = Math.min(opacity, 0.1); // Keep them very transparent if not highlighted
+                }
+
+
+                region.material.opacity = opacity;
             });
 
             // Adjust outline opacity if needed for slice views (optional, could remain constant)
@@ -1052,6 +1224,7 @@
                 brainOutline.material.opacity = 0.1; // Restore normal opacity in 3D
             }
         }
+
 
         function onImageUpload(event) {
             const file = event.target.files[0];
@@ -1121,49 +1294,84 @@
             `;
         }
 
-
+        // Modified Highlight function for clearer visual indication
         function highlightRegion(regionName) {
             resetHighlight(); // First, reset any existing highlight
 
-            // Find all objects associated with the selected region name
             brainRegions.forEach(obj => {
                 if (obj.userData.regionName === regionName) {
-                    obj.material.emissive.setHex(0x444444); // Subtle emission for highlight
-                    obj.scale.set(1.1, 1.1, 1.1); // Slightly enlarge
+                    currentlyHighlightedRegion = obj; // Store the currently highlighted object
 
-                    // Animate highlight
-                    let scale = 1.1;
+                    // Store original color if not already stored (should be stored during creation)
+                    if (obj.userData.originalColor === undefined) {
+                        obj.userData.originalColor = obj.material.color.getHex();
+                    }
+                    if (obj.userData.originalOpacity === undefined) { // Store original opacity too
+                        obj.userData.originalOpacity = obj.material.opacity;
+                    }
+
+
+                    // Apply a bright emissive color for a glowing effect
+                    obj.material.emissive.setHex(0xFFFFFF); // Bright white glow
+                    obj.material.emissiveIntensity = 0.8; // Increase glow intensity
+
+                    // Also ensure it's fully visible and transparent
+                    obj.material.opacity = 1.0; // Make it fully opaque when highlighted
+                    obj.material.transparent = false; // Turn off transparency during highlight
+
+                    // Slightly enlarge
+                    obj.scale.set(1.05, 1.05, 1.05);
+
+                    // Animate a pulsating glow (optional, but enhances effect)
+                    let glowIntensity = 0.8;
                     let growing = true;
-                    // Clear any existing animation interval for this object first
                     if (obj.userData.highlightInterval) {
                         clearInterval(obj.userData.highlightInterval);
-                        obj.userData.highlightInterval = null;
                     }
-                    const highlightAnimation = setInterval(() => {
+                    obj.userData.highlightInterval = setInterval(() => {
                         if (growing) {
-                            scale += 0.01;
-                            if (scale >= 1.2) growing = false;
+                            glowIntensity += 0.05;
+                            if (glowIntensity >= 1.5) growing = false;
                         } else {
-                            scale -= 0.01;
-                            if (scale <= 1.1) growing = true;
+                            glowIntensity -= 0.05;
+                            if (glowIntensity <= 0.8) growing = true;
                         }
-                        obj.scale.set(scale, scale, scale);
-                    }, 50);
-                    obj.userData.highlightInterval = highlightAnimation;
+                        obj.material.emissiveIntensity = glowIntensity;
+                    }, 100); // Slower pulse
                 }
             });
         }
 
         function resetHighlight() {
+            if (currentlyHighlightedRegion && currentlyHighlightedRegion.userData.highlightInterval) {
+                clearInterval(currentlyHighlightedRegion.userData.highlightInterval);
+                currentlyHighlightedRegion.userData.highlightInterval = null;
+            }
+
             brainRegions.forEach(r => {
                 r.material.emissive.setHex(0x000000); // Clear emission
-                r.scale.set(1, 1, 1); // Reset scale
-                if (r.userData.highlightInterval) {
-                    clearInterval(r.userData.highlightInterval);
-                    r.userData.highlightInterval = null;
+                r.material.emissiveIntensity = 0; // Reset intensity
+                if (r.userData.originalColor !== undefined) {
+                    r.material.color.setHex(r.userData.originalColor); // Restore original base color
                 }
+                // Restore original opacity
+                if (r.userData.originalOpacity !== undefined) {
+                    r.material.opacity = r.userData.originalOpacity;
+                    r.material.transparent = true; // Re-enable transparency
+                } else {
+                    // Fallback for regions without specific originalOpacity (e.g., initial lobes)
+                    if (r.userData.regionName === 'basal_ganglia' || r.userData.regionName === 'white_matter_tracts') {
+                        r.material.opacity = 0.2;
+                    } else {
+                        r.material.opacity = 0.8;
+                    }
+                    r.material.transparent = true;
+                }
+                r.scale.set(1, 1, 1); // Reset scale
             });
+            currentlyHighlightedRegion = null;
         }
+
 
         function resetView() {
             camera.position.set(0, 0, 5);
@@ -1177,15 +1385,31 @@
             document.getElementById('viewMode').value = '3d';
             currentViewMode = '3d';
             document.getElementById('sliceControls').style.display = 'none';
+            // Reset all regions to their original state
             brainRegions.forEach(region => {
-                region.material.opacity = 0.8;
-                region.material.emissive.setHex(0x000000);
-                region.scale.set(1, 1, 1);
+                if (region.userData.originalColor !== undefined) {
+                    region.material.color.setHex(region.userData.originalColor); // Restore original base color
+                }
+                // Restore original opacity considering special cases
+                if (region.userData.originalOpacity !== undefined) {
+                    region.material.opacity = region.userData.originalOpacity;
+                } else {
+                    if (region.userData.regionName === 'basal_ganglia' || region.userData.regionName === 'white_matter_tracts') {
+                        region.material.opacity = 0.2;
+                    } else {
+                        region.material.opacity = 0.8;
+                    }
+                }
+                region.material.transparent = true; // Re-enable transparency
+                region.material.emissive.setHex(0x000000); // Clear emission
+                region.material.emissiveIntensity = 0; // Reset intensity
+                region.scale.set(1, 1, 1); // Reset scale
                 if (region.userData.highlightInterval) {
                     clearInterval(region.userData.highlightInterval);
                     region.userData.highlightInterval = null;
                 }
             });
+            currentlyHighlightedRegion = null; // Clear currently highlighted
             const existingImage = scene.getObjectByName('uploadedImage');
             if (existingImage) {
                 scene.remove(existingImage);
